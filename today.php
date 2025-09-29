@@ -556,7 +556,7 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
             filterForm.submit();
         };
 
-        // Add event listeners to the select, checkboxes, and search input to trigger form submission
+        // oke Add event listeners to the select, checkboxes, and search input to trigger form submission
         filterSelect.addEventListener('change', submitForm);
         hideDoneAndSkippedCheckbox.addEventListener('change', submitForm);
         
