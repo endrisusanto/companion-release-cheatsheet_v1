@@ -20,12 +20,32 @@ startSessionIfNotStarted();
         body {
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         .main-content {
             flex: 1 0 auto;
+            position: relative;
+            z-index: 1;
         }
         .footer {
             flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        /* Particle background styling */
+        #particle-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        /* Ensure content is above particles */
+        nav, main, .footer {
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
@@ -89,4 +109,5 @@ startSessionIfNotStarted();
             unset($_SESSION['flash_message']);
             unset($_SESSION['flash_type']);
         }
-        ?> 
+        ?>
+    <script src="assets/js/particle-background.js"></script> 
