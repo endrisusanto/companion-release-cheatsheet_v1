@@ -37,23 +37,34 @@ try {
 
         // Add header row
         $xml .= '<Row>';
+        // Add existing headers
         foreach (array_keys($releases[0]) as $header) {
             $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($header) . '</Data></Cell>';
         }
+        // *** ADD NEW HEADER FOR CSC CHECK ***
+        $xml .= '<Cell><Data ss:Type="String">CSC Check</Data></Cell>';
         $xml .= '</Row>';
 
         // Add data rows
         foreach ($releases as $row) {
             $xml .= '<Row>';
+            // Add existing cell data
             foreach ($row as $cell) {
-                // Determine data type, default to String
-                $type = 'String';
-                if (is_numeric($cell)) {
-                    $type = 'Number';
-                }
-                // *** FIX HERE: Handle NULL values by replacing them with an empty string ***
+                $type = is_numeric($cell) ? 'Number' : 'String';
                 $xml .= '<Cell><Data ss:Type="' . $type . '">' . htmlspecialchars($cell ?? '') . '</Data></Cell>';
             }
+
+            // *** ADD NEW CELL FOR CSC CHECK LOGIC ***
+            $cscValue = $row['csc'] ?? '';
+            $cscCheckResult = 'Not OK'; // Default value
+            
+            // Case-insensitive check for OXM, OLM, or OXT
+            if (stripos($cscValue, 'OXM') !== false || stripos($cscValue, 'OLM') !== false || stripos($cscValue, 'OXT') !== false) {
+                $cscCheckResult = 'OK';
+            }
+            
+            $xml .= '<Cell><Data ss:Type="String">' . $cscCheckResult . '</Data></Cell>';
+            
             $xml .= '</Row>';
         }
 
