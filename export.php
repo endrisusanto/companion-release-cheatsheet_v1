@@ -12,49 +12,58 @@ if (!isLoggedIn()) {
     exit;
 }
 
-// Fetch all releases from the database
+// Function to safely encode data for XML
+function encodeCellData($value) {
+    // Replace null with empty string and then encode
+    return htmlspecialchars($value ?? '', ENT_XML1);
+}
+
 try {
+    // Fetch all releases from the database
     $sql = "SELECT * FROM release_cheatsheets ORDER BY created_at DESC";
     $stmt = $pdo->query($sql);
 
     if ($stmt->rowCount() > 0) {
         $releases = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Set headers for Excel XML download
+        // --- Start Generating Excel File ---
+
         $filename = "releases_" . date('Y-m-d') . ".xls";
         header("Content-Type: application/vnd.ms-excel; charset=utf-8");
         header("Content-Disposition: attachment; filename=\"$filename\"");
+        header("Pragma: no-cache");
+        header("Expires: 0");
 
-        // Start XML workbook
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-          xmlns:o="urn:schemas-microsoft-com:office:office"
-          xmlns:x="urn:schemas-microsoft-com:office:excel"
-          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-          xmlns:html="http://www.w3.org/TR/REC-html40">';
-        $xml .= '<Worksheet ss:Name="All Releases">';
-        $xml .= '<Table>';
+        // Start XML structure
+        echo '<?xml version="1.0" encoding="UTF-8"?>';
+        echo '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+                xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">';
+        echo '<Worksheet ss:Name="All Releases">';
+        echo '<Table>';
 
-        // Add header row
-        $xml .= '<Row>';
-        // Add existing headers
-        foreach (array_keys($releases[0]) as $header) {
-            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($header) . '</Data></Cell>';
+        // Get original headers from the first row of data
+        $headers = array_keys($releases[0]);
+        // Add the new custom header
+        $headers[] = 'CSC Check';
+
+        // Write header row
+        echo '<Row>';
+        foreach ($headers as $header) {
+            echo '<Cell><Data ss:Type="String">' . encodeCellData($header) . '</Data></Cell>';
         }
-        // *** ADD NEW HEADER FOR CSC CHECK ***
-        $xml .= '<Cell><Data ss:Type="String">CSC Check</Data></Cell>';
-        $xml .= '</Row>';
+        echo '</Row>';
 
-        // Add data rows
+        // Write data rows
         foreach ($releases as $row) {
-            $xml .= '<Row>';
-            // Add existing cell data
-            foreach ($row as $cell) {
-                $type = is_numeric($cell) ? 'Number' : 'String';
-                $xml .= '<Cell><Data ss:Type="' . $type . '">' . htmlspecialchars($cell ?? '') . '</Data></Cell>';
+            echo '<Row>';
+            
+            // Write original data cells
+            foreach ($row as $value) {
+                $type = is_numeric($value) ? 'Number' : 'String';
+                echo '<Cell><Data ss:Type="' . $type . '">' . encodeCellData($value) . '</Data></Cell>';
             }
 
-            // *** ADD NEW CELL FOR CSC CHECK LOGIC ***
+            // --- CSC Check Logic ---
             $cscValue = $row['csc'] ?? '';
             $cscCheckResult = 'Not OK'; // Default value
             
@@ -63,16 +72,16 @@ try {
                 $cscCheckResult = 'OK';
             }
             
-            $xml .= '<Cell><Data ss:Type="String">' . $cscCheckResult . '</Data></Cell>';
+            // Write the new CSC Check cell
+            echo '<Cell><Data ss:Type="String">' . $cscCheckResult . '</Data></Cell>';
             
-            $xml .= '</Row>';
+            echo '</Row>';
         }
 
-        $xml .= '</Table>';
-        $xml .= '</Worksheet>';
-        $xml .= '</Workbook>';
-
-        echo $xml;
+        // End XML structure
+        echo '</Table>';
+        echo '</Worksheet>';
+        echo '</Workbook>';
 
     } else {
         // Handle no data found
