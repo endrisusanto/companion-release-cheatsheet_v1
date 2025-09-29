@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/header.php';
 //     exit;
 // }
 
-// NEW: Date handling logic
+// Date handling logic
 $displayDateStr = $_GET['date'] ?? date('Y-m-d');
 try {
     // Sanitize the date input to ensure it's in the expected format
@@ -23,11 +23,11 @@ try {
     $displayDateStr = $displayDate->format('Y-m-d');
 }
 
-// NEW: Calculate previous and next dates
+// Calculate previous and next dates
 $prevDate = (clone $displayDate)->modify('-1 day')->format('Y-m-d');
 $nextDate = (clone $displayDate)->modify('+1 day')->format('Y-m-d');
 
-// NEW: Build query string for navigation links to preserve filters
+// Build query string for navigation links to preserve filters
 $queryParams = $_GET; // Get all current filters
 
 // Prepare link for the previous day
@@ -40,7 +40,6 @@ $nextDateParams = $queryParams;
 $nextDateParams['date'] = $nextDate;
 $nextLink = '?' . http_build_query($nextDateParams);
 
-
 // Get filter from query parameter (default to 'my')
 $filter = $_GET['filter'] ?? 'my';
 
@@ -48,7 +47,7 @@ $filter = $_GET['filter'] ?? 'my';
 $hideDoneAndSkipped = isset($_GET['hideDoneAndSkipped']) && $_GET['hideDoneAndSkipped'] === 'true';
 $filterApInclude = isset($_GET['filterApInclude']) && $_GET['filterApInclude'] === 'true';
 $filterApExclude = isset($_GET['filterApExclude']) && $_GET['filterApExclude'] === 'true';
-$filterEmptyP4Path = isset($_GET['filterEmptyP4Path']) && $_GET['filterEmptyP4Path'] === 'true'; // New checkbox
+$filterEmptyP4Path = isset($_GET['filterEmptyP4Path']) && $_GET['filterEmptyP4Path'] === 'true';
 
 // Get search query from parameter
 $searchQuery = $_GET['search'] ?? '';
@@ -67,40 +66,25 @@ if ($filterApInclude && !$filterApExclude) {
     $apFilterType = 'exclude';
 }
 
-// MODIFIED: Fetch releases based on the selected date
+// Fetch releases based on the selected date
 $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStatuses, $apFilterType, $searchQuery, $filterEmptyP4Path);
-
 ?>
 
 <style>
     .container {
         max-width: 100%; /* Make container full width */
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .bg-white {
-        border-radius: 0; /* Remove border radius */
-        box-shadow: none; /* Remove shadow */
+        border-radius: 0.5rem; /* Add border radius like other pages */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Add subtle shadow */
     }
 
     .overflow-x-auto {
-        margin-left: 1rem; /* Adjust margin to negate default padding */
-        margin-right: 1rem;
-    }
-
-    @media (min-width: 640px) {
-        .overflow-x-auto {
-            margin-left: 1.5rem; /* Adjust for larger screens */
-            margin-right: 1.5rem;
-        }
-    }
-
-    @media (min-width: 768px) {
-        .overflow-x-auto {
-            margin-left: 2rem; /* Adjust for even larger screens */
-            margin-right: 2rem;
-        }
+        margin-left: 0; /* Remove custom margins */
+        margin-right: 0;
     }
 
     .table-container {
@@ -142,6 +126,121 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
         font-size: 0.875rem;
         line-height: 1.25rem;
     }
+
+    /* Table wrapper for side-by-side layout */
+    .table-wrapper {
+        display: flex;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .main-table-container {
+        flex: 1;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .action-table-container {
+        position: sticky;
+        right: 0;
+        top: 0;
+        background: white;
+        border-left: 2px solid #e5e7eb;
+        z-index: 10;
+        min-width: 320px;
+        max-width: 320px;
+    }
+
+    .action-table {
+        width: 100%;
+        background: white;
+    }
+
+    /* Ensure both tables have same row heights */
+    .main-table-container table,
+    .action-table {
+        table-layout: fixed;
+    }
+
+    /* Synchronize header heights - make them exactly the same */
+    .main-table-container thead th,
+    .action-table thead th {
+        height: 48px; /* Fixed header height */
+        padding: 12px; /* Consistent padding */
+        vertical-align: middle;
+    }
+
+    /* Synchronize row heights for body */
+    .main-table-container tbody tr,
+    .action-table tbody tr {
+        height: 65px; /* Fixed height for consistency */
+    }
+
+    /* Ensure both table headers have same background and styling */
+    .main-table-container thead,
+    .action-table thead {
+        background-color: #1f2937;
+        color: white;
+    }
+
+    /* Make action table header aligns with main table header */
+    .action-table thead th {
+        border-left: 2px solid #374151;
+        font-weight: 600;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    /* Remove divide between Status and Action headers */
+    .action-table thead th:first-child {
+        border-right: none;
+    }
+
+    .action-table thead th:last-child {
+        border-left: none;
+    }
+
+    /* Remove divide between Status and Action body cells */
+    .action-table tbody td:first-child {
+        border-right: none;
+    }
+
+    .action-table tbody td:last-child {
+        border-left: none;
+    }
+
+    /* Make Status and Action columns look unified */
+    .action-table thead th {
+        border-right: none;
+        border-left: none;
+    }
+
+    .action-table thead th:first-child {
+        border-right: none;
+        border-left: 2px solid #374151; /* Only left border for first column */
+    }
+
+    .action-table tbody td {
+        border-right: none;
+        border-left: none;
+    }
+
+    .action-table tbody td:first-child {
+        border-right: none;
+        border-left: none;
+    }
+
+    /* Add shadow to action table for visual separation */
+    .action-table-container::before {
+        content: '';
+        position: absolute;
+        left: -2px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+        z-index: 1;
+    }
 </style>
 
 <div class="bg-white">
@@ -160,8 +259,8 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
             <?php endif; ?>
         </div>
 
-        <div class="mb-4 flex flex-wrap items-center space-x-4">
-            <form id="filterForm" method="GET" class="flex flex-wrap items-center gap-4">
+        <div class="mb-4">
+            <form id="filterForm" method="GET" class="flex flex-wrap items-center gap-4 justify-end">
                 <input type="hidden" name="date" value="<?php echo htmlspecialchars($displayDateStr); ?>">
                 
                 <div class="flex items-center space-x-2">
@@ -197,37 +296,35 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
                     <input type="text" name="search" id="search" placeholder="Model, PIC, AP, CSC..."
                             value="<?php echo htmlspecialchars($searchQuery); ?>"
                             class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap">Apply Filters</button>
                 </div>
-
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Apply Filters</button>
             </form>
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full bg-white overflow-hidden table">
-            <thead class="bg-gray-800 text-white sticky top-0 z-10">
-                <tr>
-                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">Model</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">PIC</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">AP</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">CP</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC VERSION OXM/OLM BARU</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">OXM/OLM QB User</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">CSC VERSION XID LAMA</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">Previous Release QB XID</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC User (XID)</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC Eng (XID)</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">Additional CL</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">P4 Path</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">Partial CL CSC LAMA</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC Version Up</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[60px]">Release Note</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">Status</th>
-                    <th class="py-2 px-3 text-left text-sm min-w-[200px]">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200" id="releaseTableBody">
+    <div class="table-wrapper">
+        <div class="main-table-container">
+            <table class="w-full bg-white overflow-hidden table" id="mainTable">
+                <thead class="bg-gray-800 text-white sticky top-0 z-10">
+                    <tr>
+                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">Model</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">PIC</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">AP</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">CP</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC VERSION OXM/OLM BARU</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">OXM/OLM QB User</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">CSC VERSION XID LAMA</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">Previous Release QB XID</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC User (XID)</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC Eng (XID)</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">Additional CL</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">P4 Path</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">Partial CL CSC LAMA</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC Version Up</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[60px]">Release Note</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200" id="releaseTableBody">
                 <?php if (empty($todayReleases)): ?>
                     <tr>
                         <td colspan="17" class="py-6 px-3 text-center text-sm text-gray-500">
@@ -243,13 +340,13 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
                             <td class="py-2 px-3 text-sm">
                                 <span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Click to copy"><?php echo htmlspecialchars($release['pic']); ?></span>
                             </td>
-                            <td class="py-2 px-3 text-sm  highlight-blue <?php echo (stripos($release['ap'], 'XXS') !== false || stripos($release['ap'], 'DXS') !== false || stripos($release['ap'], 'TBS') !== false) ? 'highlight' : ''; ?>">
+                            <td class="py-2 px-3 text-sm highlight-blue <?php echo (stripos($release['ap'], 'XXS') !== false || stripos($release['ap'], 'DXS') !== false || stripos($release['ap'], 'TBS') !== false) ? 'highlight' : ''; ?>">
                                 <span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Click to copy"><?php echo htmlspecialchars($release['ap']); ?></span>
                             </td>
-                            <td class="py-2 px-3 text-sm ">
+                            <td class="py-2 px-3 text-sm">
                                 <span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Click to copy"><?php echo htmlspecialchars($release['cp']); ?></span>
                             </td>
-                            <td class="py-2 px-3 text-sm font-bold text-green-600 " data-field="csc" data-id="<?php echo $release['id']; ?>">
+                            <td class="py-2 px-3 text-sm font-bold text-green-600 editable" data-field="csc" data-id="<?php echo $release['id']; ?>">
                                 <span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit"><?php echo htmlspecialchars($release['csc']); ?></span>
                             </td>
                             <td class="py-2 px-3 text-sm editable" data-field="qb_csc_user" data-id="<?php echo $release['id']; ?>">
@@ -294,7 +391,7 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
                                         data-debug="Empty"></i>
                                 <?php endif; ?>
                             </td>
-                            <td class="py-2 px-3 text-sm font-bold text-green-600" data-field="csc_version_up" data-id="<?php echo $release['id']; ?>">
+                            <td class="py-2 px-3 text-sm font-bold text-green-600 editable" data-field="csc_version_up" data-id="<?php echo $release['id']; ?>">
                                 <span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit"><?php echo htmlspecialchars($release['csc_version_up']); ?></span>
                             </td>
                             <td class="py-2 px-3 text-sm text-center">
@@ -309,41 +406,68 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
                                         data-debug="Empty"></i>
                                 <?php endif; ?>
                             </td>
-                            <td class="py-2 px-3 text-sm">
-                                <?php if ($release['status'] === 'done'): ?>
-                                    <span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded">Done</span>
-                                <?php elseif ($release['status'] === 'in_progress'): ?>
-                                    <span class="text-yellow-600 font-normal bg-yellow-100 px-2 py-1 rounded">Progress</span>
-                                <?php elseif ($release['status'] === 'skipped'): ?>
-                                    <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">Skipped</span>
-                                <?php else: ?>
-                                    <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">New !</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="py-2 px-3 text-sm">
-                                <div class="flex justify-end space-x-2">
-                                    <a href="view.php?id=<?php echo $release['id']; ?>" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-md text-sm">
-                                        <i class="fas fa-eye mr-1"></i>View
-                                    </a>
-                                    <a href="edit.php?id=<?php echo $release['id']; ?>" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded-md text-sm">
-                                        <i class="fas fa-edit mr-1"></i>Edit
-                                    </a>
-                                    <a href="delete.php?id=<?php echo $release['id']; ?>"
-                                       class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-md text-sm"
-                                       onclick="return confirm('Are you sure you want to delete this release?')">
-                                        <i class="fas fa-trash mr-1"></i>Delete
-                                    </a>
-                                </div>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
+        
+        <div class="action-table-container">
+            <table class="action-table" id="actionTable">
+                <thead class="bg-gray-800 text-white sticky top-0 z-10">
+                    <tr>
+                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">Status</th>
+                        <th class="py-2 px-3 text-left text-sm min-w-[200px]">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200" id="actionTableBody">
+                    <?php if (empty($todayReleases)): ?>
+                        <tr>
+                            <td colspan="2" class="py-6 px-3 text-center text-sm text-gray-500">
+                                No actions available
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($todayReleases as $release): ?>
+                            <tr class="hover:bg-gray-50" data-status="<?php echo htmlspecialchars($release['status']); ?>">
+                                <td class="py-2 px-3 text-sm" data-status-cell>
+                                    <?php if ($release['status'] === 'done'): ?>
+                                        <span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded">Done</span>
+                                    <?php elseif ($release['status'] === 'in_progress'): ?>
+                                        <span class="text-yellow-600 font-normal bg-yellow-100 px-2 py-1 rounded">Progress</span>
+                                    <?php elseif ($release['status'] === 'skipped'): ?>
+                                        <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">Skipped</span>
+                                    <?php else: ?>
+                                        <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">New !</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-2 px-3 text-sm">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="view.php?id=<?php echo $release['id']; ?>" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-md text-sm">
+                                            <i class="fas fa-eye mr-1"></i>View
+                                        </a>
+                                        <a href="edit.php?id=<?php echo $release['id']; ?>" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded-md text-sm">
+                                            <i class="fas fa-edit mr-1"></i>Edit
+                                        </a>
+                                        <a href="delete.php?id=<?php echo $release['id']; ?>"
+                                           class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-md text-sm"
+                                           onclick="return confirm('Are you sure you want to delete this release?')">
+                                            <i class="fas fa-trash mr-1"></i>Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
+    // Utility function to copy text to clipboard
     function copyToClipboard(text, element) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(() => {
@@ -357,6 +481,7 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
         }
     }
 
+    // Fallback for older browsers
     function fallbackCopy(text, element) {
         try {
             const textarea = document.createElement('textarea');
@@ -379,6 +504,7 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
         }
     }
 
+    // Show feedback for copy or save actions
     function showCopyFeedback(element, message, isError = false) {
         element.classList.add(isError ? 'bg-red-200' : 'bg-yellow-200');
         setTimeout(() => element.classList.remove(isError ? 'bg-red-200' : 'bg-yellow-200'), 1500);
@@ -403,60 +529,27 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
     });
 
     // Inline editing functionality
+    let isEditing = false; // Prevent multiple simultaneous edits
+
     document.querySelectorAll('.editable').forEach(cell => {
         cell.addEventListener('dblclick', () => {
-            if (cell.classList.contains('editing')) return;
+            if (isEditing || cell.classList.contains('editing')) return;
+            isEditing = true;
 
             const releaseId = cell.dataset.id;
-            const currentRow = cell.closest('tr');
-            // Re-calculate the status column index as a new column was added before it
-            const statusCells = currentRow.querySelectorAll('td');
-            const currentStatusCell = statusCells[15]; // Now index 15 for the 16th td (0-indexed)
-            const currentStatusSpan = currentStatusCell.querySelector('span');
-            const currentStatusText = currentStatusSpan ? currentStatusSpan.textContent.trim().toLowerCase() : '';
-
-            // Condition: Change status to 'in_progress' if it's 'new' or 'pending'
-            if (currentStatusText === 'new !' || currentStatusText === 'pending') {
-                // Send AJAX to update status to 'in_progress'
-                const statusData = new URLSearchParams();
-                statusData.append('id', releaseId);
-                statusData.append('status', 'in_progress'); // Target status
-
-                fetch('update_status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest' // Identify as AJAX request
-                    },
-                    body: statusData.toString()
-                })
-                .then(response => {
-                    // Check if response is JSON, if not, handle redirect or plain text
-                    const contentType = response.headers.get("content-type");
-                    if (contentType && contentType.indexOf("application/json") !== -1) {
-                        return response.json();
-                    } else {
-                        console.warn("Expected JSON but received non-JSON response from update_status.php. Assuming redirect or non-critical.");
-                        return Promise.reject('Non-JSON response from update_status.php');
-                    }
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Update the status cell in UI
-                        currentStatusCell.innerHTML = '<span class="text-yellow-600 font-normal bg-yellow-100 px-2 py-1 rounded">Progress</span>';
-                        currentRow.dataset.status = 'in_progress'; // Update data-status attribute on row
-                    } else {
-                        console.error('Failed to update status via AJAX:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating status via AJAX:', error);
-                });
-            }
-
-            // Proceed with making the cell editable
+            const field = cell.dataset.field;
             const span = cell.querySelector('span');
             const originalText = span.textContent.trim();
+            const currentRow = cell.closest('tr');
+            const statusCell = currentRow.querySelector('td[data-status-cell]');
+            const currentStatus = statusCell ? statusCell.querySelector('span').textContent.trim().toLowerCase() : '';
+
+            // Update status to 'in_progress' if 'new' or 'pending'
+            if (currentStatus === 'new !' || currentStatus === 'pending') {
+                updateStatus(releaseId, currentRow, statusCell);
+            }
+
+            // Create input field
             const input = document.createElement('input');
             input.type = 'text';
             input.className = 'editable-input';
@@ -467,115 +560,197 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
             cell.appendChild(input);
             input.focus();
 
-            input.addEventListener('blur', () => saveEdit(cell, input, originalText));
+            // Handle save or cancel
+            const saveEdit = () => {
+                const newValue = input.value.trim() || '-';
+                if (!validateInput(field, newValue)) {
+                    showCopyFeedback(cell, `Invalid input for ${field}`, true);
+                    revertEdit(cell, originalText);
+                    isEditing = false;
+                    return;
+                }
+
+                // Update UI immediately
+                cell.classList.remove('editing');
+                cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${newValue}</span>`;
+
+                // Skip AJAX if value hasn't changed
+                if (newValue === originalText) {
+                    isEditing = false;
+                    return;
+                }
+
+                // Send AJAX request to update
+                const data = new URLSearchParams();
+                data.append('id', releaseId);
+                data.append('field', field);
+                data.append('value', newValue);
+
+                fetch('update_release.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: data.toString()
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showCopyFeedback(cell, 'Saved!', false);
+                    } else {
+                        console.error('Save failed:', data.message);
+                        showCopyFeedback(cell, `Save failed: ${data.message}`, true);
+                        revertEdit(cell, originalText);
+                    }
+                })
+                .catch(error => {
+                    console.error('AJAX error:', error.message);
+                    showCopyFeedback(cell, `Save failed: ${error.message}`, true);
+                    revertEdit(cell, originalText);
+                })
+                .finally(() => {
+                    isEditing = false;
+                });
+            };
+
+            // Event listeners for input
+            input.addEventListener('blur', saveEdit);
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    saveEdit(cell, input, originalText);
+                    saveEdit();
                 } else if (e.key === 'Escape') {
-                    cell.classList.remove('editing');
-                    cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${originalText}</span>`;
+                    revertEdit(cell, originalText);
+                    isEditing = false;
                 }
             });
         });
     });
 
-    function saveEdit(cell, input, originalText) {
-        const newValue = input.value.trim() || '-';
-        const field = cell.dataset.field;
-        const id = cell.dataset.id;
+    // Validate input based on field type
+    function validateInput(field, value) {
+        const rules = {
+            'qb_csc_user': value => value === '-' || /^[A-Za-z0-9-]+$/.test(value),
+            'ole_version': value => value === '-' || /^[A-Za-z0-9._-]+$/.test(value),
+            'qb_user': value => value === '-' || /^[A-Za-z0-9-]+$/.test(value),
+            'qb_csc_user_xid': value => value === '-' || /^[A-Za-z0-9-]+$/.test(value),
+            'qb_csc_eng': value => value === '-' || /^[A-Za-z0-9-]+$/.test(value),
+            'additional_cl': value => value === '-' || /^[0-9, ]+$/.test(value),
+        };
+        return rules[field] ? rules[field](value) : true;
+    }
 
-        // Validate inputs
-        if (!id || !field) {
-            console.error('Missing id or field:', { id, field });
-            showCopyFeedback(cell, 'Invalid data', true);
-            cell.classList.remove('editing');
-            cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${originalText}</span>`;
-            return;
-        }
-
-        // Update UI immediately
+    // Revert edit on error or cancel
+    function revertEdit(cell, originalText) {
         cell.classList.remove('editing');
-        cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${newValue}</span>`;
+        cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${originalText}</span>`;
+    }
 
-        // Only send AJAX if value changed
-        if (newValue === originalText) {
-            console.log('No change in value, skipping AJAX');
-            return;
-        }
+    // Update status to 'in_progress'
+    function updateStatus(releaseId, currentRow, statusCell) {
+        const statusData = new URLSearchParams();
+        statusData.append('id', releaseId);
+        statusData.append('status', 'in_progress');
 
-        // Prepare data for AJAX
-        const data = new URLSearchParams();
-        data.append('id', id);
-        data.append('field', field);
-        data.append('value', newValue);
-
-        console.log('Sending AJAX request:', { id, field, value: newValue });
-
-        fetch('update_release.php', {
+        fetch('update_status.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: data.toString()
+            body: statusData.toString()
         })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.json();
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            }
+            throw new Error('Non-JSON response from update_status.php');
         })
         .then(data => {
-            console.log('AJAX response:', data);
             if (data.success) {
-                showCopyFeedback(cell, 'Saved!', false);
+                statusCell.innerHTML = '<span class="text-yellow-600 font-normal bg-yellow-100 px-2 py-1 rounded">Progress</span>';
+                currentRow.dataset.status = 'in_progress';
             } else {
-                console.error('Save failed:', data.message);
-                showCopyFeedback(cell, `Save failed: ${data.message}`, true);
-                cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${originalText}</span>`;
+                console.error('Failed to update status:', data.message);
+                showCopyFeedback(statusCell, `Status update failed: ${data.message}`, true);
             }
         })
         .catch(error => {
-            console.error('AJAX error:', error.message);
-            showCopyFeedback(cell, `Save failed: ${error.message}`, true);
-            cell.innerHTML = `<span class="copyable cursor-pointer relative whitespace-nowrap" data-tooltip="Double-click to edit">${originalText}</span>`;
+            console.error('Error updating status:', error);
+            showCopyFeedback(statusCell, `Status update failed: ${error.message}`, true);
         });
     }
 
-    // JavaScript for filtering using the form submission
+    // Filter form submission
     document.addEventListener('DOMContentLoaded', () => {
         const filterForm = document.getElementById('filterForm');
         const filterSelect = document.getElementById('filter');
         const hideDoneAndSkippedCheckbox = document.getElementById('hideDoneAndSkipped');
         const filterApIncludeCheckbox = document.getElementById('filterApInclude');
         const filterApExcludeCheckbox = document.getElementById('filterApExclude');
-        const filterEmptyP4PathCheckbox = document.getElementById('filterEmptyP4Path'); // New checkbox
+        const filterEmptyP4PathCheckbox = document.getElementById('filterEmptyP4Path');
         const searchInput = document.getElementById('search');
 
-        // Function to submit the form
         const submitForm = () => {
             filterForm.submit();
         };
 
-        // oke Add event listeners to the select, checkboxes, and search input to trigger form submission
         filterSelect.addEventListener('change', submitForm);
         hideDoneAndSkippedCheckbox.addEventListener('change', submitForm);
-        
         filterApIncludeCheckbox.addEventListener('change', () => {
             if (filterApIncludeCheckbox.checked) {
-                filterApExcludeCheckbox.checked = false; // Uncheck the other if this one is checked
+                filterApExcludeCheckbox.checked = false;
             }
             submitForm();
         });
-
         filterApExcludeCheckbox.addEventListener('change', () => {
             if (filterApExcludeCheckbox.checked) {
-                filterApIncludeCheckbox.checked = false; // Uncheck the other if this one is checked
+                filterApIncludeCheckbox.checked = false;
             }
             submitForm();
         });
-
-        filterEmptyP4PathCheckbox.addEventListener('change', submitForm); // Add event listener for new checkbox
+        filterEmptyP4PathCheckbox.addEventListener('change', submitForm);
     });
+
+    // Synchronize scroll between main table and action table
+    const mainTableContainer = document.querySelector('.main-table-container');
+    const actionTableContainer = document.querySelector('.action-table-container');
+
+    if (mainTableContainer && actionTableContainer) {
+        mainTableContainer.addEventListener('scroll', () => {
+            actionTableContainer.scrollTop = mainTableContainer.scrollTop;
+        });
+        actionTableContainer.addEventListener('scroll', () => {
+            mainTableContainer.scrollTop = actionTableContainer.scrollTop;
+        });
+    }
+
+    // Align headers on page load and resize
+    function alignHeaders() {
+        const mainTable = document.querySelector('#mainTable');
+        const actionTable = document.querySelector('#actionTable');
+        if (mainTable && actionTable) {
+            const mainHeader = mainTable.querySelector('thead');
+            const actionHeader = actionTable.querySelector('thead');
+            if (mainHeader && actionHeader) {
+                const mainHeaderHeight = mainHeader.offsetHeight;
+                actionHeader.style.height = mainHeaderHeight + 'px';
+                actionHeader.style.minHeight = mainHeaderHeight + 'px';
+                actionHeader.style.maxHeight = mainHeaderHeight + 'px';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', alignHeaders);
+    window.addEventListener('resize', alignHeaders);
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
