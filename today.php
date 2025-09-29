@@ -175,7 +175,7 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
     /* Synchronize row heights for body */
     .main-table-container tbody tr,
     .action-table tbody tr {
-        height: 60px; /* Fixed height for consistency */
+        height: 65px; /* Fixed height for consistency */
     }
 
     /* Ensure both table headers have same background and styling */
