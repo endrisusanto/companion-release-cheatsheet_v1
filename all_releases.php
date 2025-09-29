@@ -119,69 +119,56 @@ $pagination = generatePagination($totalItems, $perPage, $page, $baseUrl, $queryS
 ?>
 
 <div class="bg-white shadow rounded-lg p-6">
-    <div class="flex items-center justify-between mb-6">
-        <a href="index.php" class="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>All Releases
-        </a>
-    </div>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">All Releases</h1>
 
     <!-- Filter Form -->
-    <form method="GET" class="mb-6">
-        <div class="flex flex-col lg:flex-row gap-4">
-            <!-- Left side filters -->
-            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                    <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">All Statuses</option>
-                        <option value="new" <?php echo $status === 'new' ? 'selected' : ''; ?>>New</option>
-                        <option value="in_progress" <?php echo $status === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
-                        <option value="done" <?php echo $status === 'done' ? 'selected' : ''; ?>>Done</option>
-                        <option value="skipped" <?php echo $status === 'skipped' ? 'selected' : ''; ?>>Skipped</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="pic" class="block text-sm font-medium text-gray-700">PIC</label>
-                    <select id="pic" name="pic" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">All PICs</option>
-                        <?php foreach ($pics as $picOption): ?>
-                            <option value="<?php echo htmlspecialchars($picOption); ?>" <?php echo $pic === $picOption ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($picOption); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                    <input type="text" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Select start date">
-                </div>
-                <div>
-                    <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
-                    <input type="text" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Select end date">
-                </div>
-            </div>
-            
-            <!-- Right side search and buttons -->
-            <div class="flex flex-col lg:flex-row lg:items-end gap-4">
-                <div class="flex-1 lg:min-w-[300px]">
-                    <label for="search" class="block text-sm font-medium text-gray-700">Search Any Field</label>
-                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Search model, AP, CP, CSC, PIC, etc.">
-                </div>
-                <div class="flex gap-2">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md whitespace-nowrap">
-                        <i class="fas fa-filter mr-2"></i>Apply Filter
-                    </button>
-                    <a href="export.php" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md whitespace-nowrap">
-                        <i class="fas fa-file-excel mr-2"></i>Export Excel
-                    </a>
-                </div>
-            </div>
+    <form method="GET" class="mb-6 flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+            <label for="search" class="block text-sm font-medium text-gray-700">Search Any Field</label>
+            <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Search model, AP, CP, CSC, PIC, etc.">
+        </div>
+        <div class="flex-1">
+            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">All Statuses</option>
+                <option value="new" <?php echo $status === 'new' ? 'selected' : ''; ?>>New</option>
+                <option value="in_progress" <?php echo $status === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                <option value="done" <?php echo $status === 'done' ? 'selected' : ''; ?>>Done</option>
+                <option value="skipped" <?php echo $status === 'skipped' ? 'selected' : ''; ?>>Skipped</option>
+            </select>
+        </div>
+        <div class="flex-1">
+            <label for="pic" class="block text-sm font-medium text-gray-700">PIC</label>
+            <select id="pic" name="pic" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">All PICs</option>
+                <?php foreach ($pics as $picOption): ?>
+                    <option value="<?php echo htmlspecialchars($picOption); ?>" <?php echo $pic === $picOption ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($picOption); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="flex-1">
+            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+            <input type="text" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Select start date">
+        </div>
+        <div class="flex-1">
+            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
+            <input type="text" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Select end date">
+        </div>
+        <div class="flex items-end">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                <i class="fas fa-filter mr-2"></i>Filter
+            </button>
+            <a href="export.php" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md ml-2">
+                <i class="fas fa-file-excel mr-2"></i>Export to Excel
+            </a>
         </div>
     </form>
 

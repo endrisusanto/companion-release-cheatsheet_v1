@@ -75,18 +75,32 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
 <style>
     .container {
         max-width: 100%; /* Make container full width */
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
 
     .bg-white {
-        border-radius: 0.5rem; /* Add border radius like other pages */
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Add subtle shadow */
+        border-radius: 0; /* Remove border radius */
+        box-shadow: none; /* Remove shadow */
     }
 
     .overflow-x-auto {
-        margin-left: 0; /* Remove custom margins */
-        margin-right: 0;
+        margin-left: 1rem; /* Adjust margin to negate default padding */
+        margin-right: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .overflow-x-auto {
+            margin-left: 1.5rem; /* Adjust for larger screens */
+            margin-right: 1.5rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .overflow-x-auto {
+            margin-left: 2rem; /* Adjust for even larger screens */
+            margin-right: 2rem;
+        }
     }
 
     .table-container {
@@ -175,7 +189,7 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
     /* Synchronize row heights for body */
     .main-table-container tbody tr,
     .action-table tbody tr {
-        height: 65px; /* Fixed height for consistency */
+        height: 60px; /* Fixed height for consistency */
     }
 
     /* Ensure both table headers have same background and styling */
@@ -261,8 +275,8 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
             <?php endif; ?>
         </div>
 
-        <div class="mb-4">
-            <form id="filterForm" method="GET" class="flex flex-wrap items-center gap-4 justify-end">
+        <div class="mb-4 flex flex-wrap items-center space-x-4">
+            <form id="filterForm" method="GET" class="flex flex-wrap items-center gap-4">
                 <input type="hidden" name="date" value="<?php echo htmlspecialchars($displayDateStr); ?>">
                 
                 <div class="flex items-center space-x-2">
@@ -298,35 +312,37 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
                     <input type="text" name="search" id="search" placeholder="Model, PIC, AP, CSC..."
                             value="<?php echo htmlspecialchars($searchQuery); ?>"
                             class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap">Apply Filters</button>
                 </div>
+
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Apply Filters</button>
             </form>
         </div>
     </div>
 
-    <div class="table-wrapper">
-        <div class="main-table-container">
-            <table class="w-full bg-white overflow-hidden table" id="mainTable">
-                <thead class="bg-gray-800 text-white sticky top-0 z-10">
-                    <tr>
-                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">Model</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">PIC</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">AP</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">CP</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC VERSION OXM/OLM BARU</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">OXM/OLM QB User</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">CSC VERSION XID LAMA</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">Previous Release QB XID</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC User (XID)</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC Eng (XID)</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">Additional CL</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">P4 Path</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[100px]">Partial CL CSC LAMA</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC Version Up</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[60px]">Release Note</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200" id="releaseTableBody">
+    <div class="overflow-x-auto">
+        <table class="w-full bg-white overflow-hidden table">
+            <thead class="bg-gray-800 text-white sticky top-0 z-10">
+                <tr>
+                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">Model</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">PIC</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">AP</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">CP</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC VERSION OXM/OLM BARU</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">OXM/OLM QB User</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">CSC VERSION XID LAMA</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">Previous Release QB XID</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC User (XID)</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">New QB CSC Eng (XID)</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">Additional CL</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">P4 Path</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">Partial CL CSC LAMA</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[120px]">CSC Version Up</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[60px]">Release Note</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[100px]">Status</th>
+                    <th class="py-2 px-3 text-left text-sm min-w-[200px]">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="releaseTableBody">
                 <?php if (empty($todayReleases)): ?>
                     <tr>
                         <td colspan="17" class="py-6 px-3 text-center text-sm text-gray-500">
@@ -408,67 +424,39 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
                                         data-debug="Empty"></i>
                                 <?php endif; ?>
                             </td>
+                            <td class="py-2 px-3 text-sm">
+                                <?php if ($release['status'] === 'done'): ?>
+                                    <span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded">Done</span>
+                                <?php elseif ($release['status'] === 'in_progress'): ?>
+                                    <span class="text-yellow-600 font-normal bg-yellow-100 px-2 py-1 rounded">Progress</span>
+                                <?php elseif ($release['status'] === 'skipped'): ?>
+                                    <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">Skipped</span>
+                                <?php else: ?>
+                                    <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">New !</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-2 px-3 text-sm">
+                                <div class="flex justify-end space-x-2">
+                                    <a href="view.php?id=<?php echo $release['id']; ?>" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-md text-sm">
+                                        <i class="fas fa-eye mr-1"></i>View
+                                    </a>
+                                    <a href="edit.php?id=<?php echo $release['id']; ?>" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded-md text-sm">
+                                        <i class="fas fa-edit mr-1"></i>Edit
+                                    </a>
+                                    <a href="delete.php?id=<?php echo $release['id']; ?>"
+                                       class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-md text-sm"
+                                       onclick="return confirm('Are you sure you want to delete this release?')">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </tbody>
         </table>
-        </div>
-        
-        <!-- Separate Action Table -->
-        <div class="action-table-container">
-            <table class="action-table" id="actionTable">
-                <thead class="bg-gray-800 text-white sticky top-0 z-10">
-                    <tr>
-                        <th class="py-2 px-3 text-left text-sm min-w-[120px]">Status</th>
-                        <th class="py-2 px-3 text-left text-sm min-w-[200px]">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200" id="actionTableBody">
-                    <?php if (empty($todayReleases)): ?>
-                        <tr>
-                            <td colspan="2" class="py-6 px-3 text-center text-sm text-gray-500">
-                                No actions available
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($todayReleases as $release): ?>
-                            <tr class="hover:bg-gray-50" data-status="<?php echo htmlspecialchars($release['status']); ?>">
-                                <td class="py-2 px-3 text-sm">
-                                    <?php if ($release['status'] === 'done'): ?>
-                                        <span class="text-green-600 font-bold bg-green-100 px-2 py-1 rounded">Done</span>
-                                    <?php elseif ($release['status'] === 'in_progress'): ?>
-                                        <span class="text-yellow-600 font-normal bg-yellow-100 px-2 py-1 rounded">Progress</span>
-                                    <?php elseif ($release['status'] === 'skipped'): ?>
-                                        <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">Skipped</span>
-                                    <?php else: ?>
-                                        <span class="text-red-600 font-bold bg-red-100 px-2 py-1 rounded">New !</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="py-2 px-3 text-sm">
-                                    <div class="flex justify-end space-x-2">
-                                        <a href="view.php?id=<?php echo $release['id']; ?>" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-md text-sm">
-                                            <i class="fas fa-eye mr-1"></i>View
-                                        </a>
-                                        <a href="edit.php?id=<?php echo $release['id']; ?>" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded-md text-sm">
-                                            <i class="fas fa-edit mr-1"></i>Edit
-                                        </a>
-                                        <a href="delete.php?id=<?php echo $release['id']; ?>"
-                                           class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-md text-sm"
-                                           onclick="return confirm('Are you sure you want to delete this release?')">
-                                            <i class="fas fa-trash mr-1"></i>Delete
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>
-
 
 <script>
     function copyToClipboard(text, element) {
@@ -703,50 +691,6 @@ $todayReleases = getTodayReleasesFiltered($displayDateStr, $filter, $excludeStat
 
         filterEmptyP4PathCheckbox.addEventListener('change', submitForm); // Add event listener for new checkbox
     });
-
-    // Synchronize scroll between main table and action table
-    const mainTableContainer = document.querySelector('.main-table-container');
-    const actionTableContainer = document.querySelector('.action-table-container');
-    
-    if (mainTableContainer && actionTableContainer) {
-        // Sync vertical scroll from main table to action table
-        mainTableContainer.addEventListener('scroll', function() {
-            actionTableContainer.scrollTop = mainTableContainer.scrollTop;
-        });
-        
-        // Sync vertical scroll from action table to main table
-        actionTableContainer.addEventListener('scroll', function() {
-            mainTableContainer.scrollTop = actionTableContainer.scrollTop;
-        });
-    }
-
-    // Ensure header alignment on page load and resize
-    function alignHeaders() {
-        const mainTable = document.querySelector('#mainTable');
-        const actionTable = document.querySelector('#actionTable');
-        
-        if (mainTable && actionTable) {
-            const mainHeader = mainTable.querySelector('thead');
-            const actionHeader = actionTable.querySelector('thead');
-            
-            if (mainHeader && actionHeader) {
-                // Get the height of main table header
-                const mainHeaderHeight = mainHeader.offsetHeight;
-                
-                // Set action table header to same height
-                actionHeader.style.height = mainHeaderHeight + 'px';
-                actionHeader.style.minHeight = mainHeaderHeight + 'px';
-                actionHeader.style.maxHeight = mainHeaderHeight + 'px';
-            }
-        }
-    }
-
-    // Align headers on page load
-    document.addEventListener('DOMContentLoaded', alignHeaders);
-    
-    // Align headers on window resize
-    window.addEventListener('resize', alignHeaders);
-
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

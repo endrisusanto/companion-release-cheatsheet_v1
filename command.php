@@ -144,9 +144,7 @@
             </div>
 
             <div class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold tracking-tight">
-                    <a href="index.php" class="bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent hover:from-sky-500 hover:to-cyan-400 transition-colors">System Build Command Converter</a>
-                </h1>
+                <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent tracking-tight">System Build Command Converter</h1>
                 <p class="mt-2 text-lg themed-text-secondary">Konversi perintah build Anda secara otomatis dengan sentuhan ajaib.</p>
             </div>
 
